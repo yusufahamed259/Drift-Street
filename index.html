@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Drift Game</title>
+
+<style>
+body{
+margin:0;
+overflow:hidden;
+background:#444;
+}
+
+#game{
+width:100vw;
+height:100vh;
+position:relative;
+background:#2c2c2c;
+}
+
+#car{
+width:60px;
+height:120px;
+background:red;
+position:absolute;
+top:300px;
+left:300px;
+transform-origin:center;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="game">
+<div id="car"></div>
+</div>
+
+<script>
+
+let car = document.getElementById("car")
+
+let x = 300
+let y = 300
+let angle = 0
+let speed = 0
+
+let keys = {}
+
+document.addEventListener("keydown", e => keys[e.key] = true)
+document.addEventListener("keyup", e => keys[e.key] = false)
+
+function gameLoop(){
+
+if(keys["ArrowUp"]){
+speed += 0.2
+}
+
+if(keys["ArrowDown"]){
+speed -= 0.2
+}
+
+speed *= 0.98
+
+if(keys["ArrowLeft"]){
+angle -= 3
+}
+
+if(keys["ArrowRight"]){
+angle += 3
+}
+
+x += Math.sin(angle * Math.PI/180) * speed
+y -= Math.cos(angle * Math.PI/180) * speed
+
+car.style.left = x + "px"
+car.style.top = y + "px"
+car.style.transform = "rotate(" + angle + "deg)"
+
+requestAnimationFrame(gameLoop)
+
+}
+
+gameLoop()
+
+</script>
+
+</body>
+</html>
