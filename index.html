@@ -1,54 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title> Drift-Street </title>
+<title>Drift-Street</title>
+
 <style>
-body{margin:0;overflow:hidden;}
+
+body{
+margin:0;
+overflow:hidden;
+font-family:Arial;
+}
+
+#menu{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+color:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:10;
+}
+
+#menu h1{
+font-size:60px;
+margin-bottom:20px;
+}
+
+#menu button{
+padding:15px 30px;
+font-size:20px;
+cursor:pointer;
+}
+
 </style>
 </head>
 
 <body>
 
+<div id="menu">
+<h1>Drift-Street</h1>
+<button onclick="startGame()">Start Game</button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
 <script>
 
-let scene = new THREE.Scene()
+let scene, camera, renderer, car
+let speed = 0
+let keys = {}
 
-let camera = new THREE.PerspectiveCamera(
+function startGame(){
+
+document.getElementById("menu").style.display="none"
+
+scene = new THREE.Scene()
+
+camera = new THREE.PerspectiveCamera(
 75,
 window.innerWidth/window.innerHeight,
 0.1,
 1000
 )
 
-let renderer = new THREE.WebGLRenderer()
-renderer.setSize(window.innerWidth, window.innerHeight)
+renderer = new THREE.WebGLRenderer()
+renderer.setSize(window.innerWidth,window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
 let roadGeometry = new THREE.PlaneGeometry(200,200)
 let roadMaterial = new THREE.MeshBasicMaterial({color:0x333333})
-let road = new THREE.Mesh(roadGeometry, roadMaterial)
 
+let road = new THREE.Mesh(roadGeometry,roadMaterial)
 road.rotation.x = -Math.PI/2
+
 scene.add(road)
 
 let carGeometry = new THREE.BoxGeometry(2,1,4)
 let carMaterial = new THREE.MeshBasicMaterial({color:0xff0000})
-let car = new THREE.Mesh(carGeometry, carMaterial)
 
+car = new THREE.Mesh(carGeometry,carMaterial)
 car.position.y = 0.5
+
 scene.add(car)
 
 camera.position.set(0,5,10)
 camera.lookAt(car.position)
 
-let speed = 0
-
-let keys = {}
-
 document.addEventListener("keydown",e=>keys[e.key]=true)
 document.addEventListener("keyup",e=>keys[e.key]=false)
+
+animate()
+
+}
 
 function animate(){
 
@@ -73,8 +121,6 @@ camera.lookAt(car.position)
 renderer.render(scene,camera)
 
 }
-
-animate()
 
 </script>
 
