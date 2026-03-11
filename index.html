@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 <title>Drift-Street</title>
 
@@ -37,7 +38,17 @@ font-size:20px;
 cursor:pointer;
 }
 
+#score{
+position:absolute;
+top:10px;
+left:10px;
+color:white;
+font-size:24px;
+z-index:5;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -47,6 +58,8 @@ cursor:pointer;
 <button onclick="startGame()">Start Game</button>
 </div>
 
+<div id="score">Drift Score: 0</div>
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
 <script>
@@ -54,6 +67,9 @@ cursor:pointer;
 let scene, camera, renderer, car
 let speed = 0
 let keys = {}
+
+let driftScore = 0
+let scoreDisplay = document.getElementById("score")
 
 function startGame(){
 
@@ -117,6 +133,24 @@ camera.position.x = car.position.x
 camera.position.z = car.position.z + 10
 
 camera.lookAt(car.position)
+
+if(Math.abs(speed) > 0.5 && (keys["ArrowLeft"] || keys["ArrowRight"])){
+
+driftScore += 1
+scoreDisplay.innerText = "Drift Score: " + driftScore
+
+let smokeGeometry = new THREE.SphereGeometry(0.2,8,8)
+let smokeMaterial = new THREE.MeshBasicMaterial({color:0xffffff})
+
+let smoke = new THREE.Mesh(smokeGeometry,smokeMaterial)
+
+smoke.position.copy(car.position)
+
+scene.add(smoke)
+
+setTimeout(()=>{scene.remove(smoke)},500)
+
+}
 
 renderer.render(scene,camera)
 
