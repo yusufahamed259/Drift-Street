@@ -1,5 +1,5 @@
 let scene,camera,renderer
-let car,police
+let car
 let speed=0
 let keys={}
 let score=0
@@ -12,11 +12,10 @@ document.getElementById("menu").style.display="none"
 scene=new THREE.Scene()
 scene.background=new THREE.Color(0x87ceeb)
 
-camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000)
+camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,2000)
 
-renderer=new THREE.WebGLRenderer()
+renderer=new THREE.WebGLRenderer({antialias:true})
 renderer.setSize(window.innerWidth,window.innerHeight)
-
 document.body.appendChild(renderer.domElement)
 
 let sun=new THREE.DirectionalLight(0xffffff,1)
@@ -29,9 +28,8 @@ scene.add(ambient)
 createRoad()
 createCity()
 loadCar()
-createPolice()
 
-camera.position.set(0,5,10)
+camera.position.set(0,6,10)
 
 document.addEventListener("keydown",e=>keys[e.key]=true)
 document.addEventListener("keyup",e=>keys[e.key]=false)
@@ -42,7 +40,7 @@ animate()
 
 function createRoad(){
 
-let geo=new THREE.PlaneGeometry(1000,1000)
+let geo=new THREE.PlaneGeometry(2000,2000)
 let mat=new THREE.MeshStandardMaterial({color:0x333333})
 
 let road=new THREE.Mesh(geo,mat)
@@ -56,15 +54,15 @@ function createCity(){
 
 for(let i=0;i<120;i++){
 
-let h=Math.random()*40+10
+let h=Math.random()*50+10
 
 let geo=new THREE.BoxGeometry(10,h,10)
 let mat=new THREE.MeshStandardMaterial({color:0x888888})
 
 let building=new THREE.Mesh(geo,mat)
 
-building.position.x=(Math.random()-0.5)*400
-building.position.z=(Math.random()-0.5)*400
+building.position.x=(Math.random()-0.5)*600
+building.position.z=(Math.random()-0.5)*600
 building.position.y=h/2
 
 scene.add(building)
@@ -75,29 +73,35 @@ scene.add(building)
 
 function loadCar(){
 
-let loader=new THREE.GLTFLoader()
+const loader=new THREE.GLTFLoader()
 
-loader.load("ToyCar.glb",function(gltf){
+loader.load("ToyCar.glb",
+
+function(gltf){
 
 car=gltf.scene
-car.scale.set(0.8,0.8,0.8)
+car.scale.set(0.7,0.7,0.7)
 car.position.y=0.2
 
 scene.add(car)
 
-})
+},
+
+undefined,
+
+function(){
+
+let geo=new THREE.BoxGeometry(2,1,4)
+let mat=new THREE.MeshStandardMaterial({color:0xff0000})
+
+car=new THREE.Mesh(geo,mat)
+car.position.y=0.5
+
+scene.add(car)
 
 }
 
-function createPolice(){
-
-let geo=new THREE.BoxGeometry(2,1,4)
-let mat=new THREE.MeshStandardMaterial({color:0x0000ff})
-
-police=new THREE.Mesh(geo,mat)
-police.position.set(20,0.5,20)
-
-scene.add(police)
+)
 
 }
 
@@ -115,7 +119,7 @@ speed*=0.98
 if(keys["ArrowLeft"])car.rotation.y+=0.04
 if(keys["ArrowRight"])car.rotation.y-=0.04
 
-if(keys["Shift"]&&nitro>0){
+if(keys["Shift"] && nitro>0){
 
 speed+=0.05
 nitro-=0.5
@@ -129,17 +133,12 @@ camera.position.x=car.position.x
 camera.position.z=car.position.z+10
 camera.lookAt(car.position)
 
-police.lookAt(car.position)
-
-police.position.x+=(car.position.x-police.position.x)*0.01
-police.position.z+=(car.position.z-police.position.z)*0.01
-
-if(Math.abs(speed)>0.5&&(keys["ArrowLeft"]||keys["ArrowRight"])){
+if(Math.abs(speed)>0.5 && (keys["ArrowLeft"]||keys["ArrowRight"])){
 
 score+=2
 
 let smokeGeo=new THREE.SphereGeometry(0.3,8,8)
-let smokeMat=new THREE.MeshBasicMaterial({color:0xffffff})
+let smokeMat=new THREE.MeshBasicMaterial()
 
 let smoke=new THREE.Mesh(smokeGeo,smokeMat)
 
