@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 <title>Drift-Street</title>
 
@@ -14,8 +13,6 @@ font-family:Arial;
 
 #menu{
 position:absolute;
-top:0;
-left:0;
 width:100%;
 height:100%;
 background:black;
@@ -29,7 +26,6 @@ z-index:10;
 
 #menu h1{
 font-size:60px;
-margin-bottom:20px;
 }
 
 #menu button{
@@ -44,11 +40,9 @@ top:10px;
 left:10px;
 color:white;
 font-size:24px;
-z-index:5;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -61,6 +55,7 @@ z-index:5;
 <div id="score">Drift Score: 0</div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/loaders/GLTFLoader.js"></script>
 
 <script>
 
@@ -88,24 +83,33 @@ renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth,window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
-let roadGeometry = new THREE.PlaneGeometry(200,200)
-let roadMaterial = new THREE.MeshBasicMaterial({color:0x333333})
+let light = new THREE.DirectionalLight(0xffffff,1)
+light.position.set(5,10,7)
+scene.add(light)
+
+let ambient = new THREE.AmbientLight(0x404040)
+scene.add(ambient)
+
+let roadGeometry = new THREE.PlaneGeometry(500,500)
+let roadMaterial = new THREE.MeshStandardMaterial({color:0x333333})
 
 let road = new THREE.Mesh(roadGeometry,roadMaterial)
 road.rotation.x = -Math.PI/2
-
 scene.add(road)
 
-let carGeometry = new THREE.BoxGeometry(2,1,4)
-let carMaterial = new THREE.MeshBasicMaterial({color:0xff0000})
+const loader = new THREE.GLTFLoader()
 
-car = new THREE.Mesh(carGeometry,carMaterial)
-car.position.y = 0.5
+loader.load("ToyCar.glb", function(gltf){
+
+car = gltf.scene
+car.scale.set(0.5,0.5,0.5)
+car.position.y = 0.2
 
 scene.add(car)
 
+})
+
 camera.position.set(0,5,10)
-camera.lookAt(car.position)
 
 document.addEventListener("keydown",e=>keys[e.key]=true)
 document.addEventListener("keyup",e=>keys[e.key]=false)
@@ -118,13 +122,15 @@ function animate(){
 
 requestAnimationFrame(animate)
 
+if(!car) return
+
 if(keys["ArrowUp"]) speed += 0.02
 if(keys["ArrowDown"]) speed -= 0.02
 
 speed *= 0.98
 
-if(keys["ArrowLeft"]) car.rotation.y += 0.05
-if(keys["ArrowRight"]) car.rotation.y -= 0.05
+if(keys["ArrowLeft"]) car.rotation.y += 0.04
+if(keys["ArrowRight"]) car.rotation.y -= 0.04
 
 car.position.x -= Math.sin(car.rotation.y)*speed
 car.position.z -= Math.cos(car.rotation.y)*speed
@@ -133,24 +139,6 @@ camera.position.x = car.position.x
 camera.position.z = car.position.z + 10
 
 camera.lookAt(car.position)
-
-if(Math.abs(speed) > 0.5 && (keys["ArrowLeft"] || keys["ArrowRight"])){
-
-driftScore += 1
-scoreDisplay.innerText = "Drift Score: " + driftScore
-
-let smokeGeometry = new THREE.SphereGeometry(0.2,8,8)
-let smokeMaterial = new THREE.MeshBasicMaterial({color:0xffffff})
-
-let smoke = new THREE.Mesh(smokeGeometry,smokeMaterial)
-
-smoke.position.copy(car.position)
-
-scene.add(smoke)
-
-setTimeout(()=>{scene.remove(smoke)},500)
-
-}
 
 renderer.render(scene,camera)
 
