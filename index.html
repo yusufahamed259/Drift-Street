@@ -1,87 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Drift Game</title>
-
+<title>3D Car Game</title>
 <style>
-body{
-margin:0;
-overflow:hidden;
-background:#444;
-}
-
-#game{
-width:100vw;
-height:100vh;
-position:relative;
-background:#2c2c2c;
-}
-
-#car{
-width:60px;
-height:120px;
-background:red;
-position:absolute;
-top:300px;
-left:300px;
-transform-origin:center;
-}
+body{margin:0;overflow:hidden;}
 </style>
-
 </head>
 
 <body>
 
-<div id="game">
-<div id="car"></div>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
 <script>
 
-let car = document.getElementById("car")
+let scene = new THREE.Scene()
 
-let x = 300
-let y = 300
-let angle = 0
+let camera = new THREE.PerspectiveCamera(
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+)
+
+let renderer = new THREE.WebGLRenderer()
+renderer.setSize(window.innerWidth, window.innerHeight)
+document.body.appendChild(renderer.domElement)
+
+let roadGeometry = new THREE.PlaneGeometry(200,200)
+let roadMaterial = new THREE.MeshBasicMaterial({color:0x333333})
+let road = new THREE.Mesh(roadGeometry, roadMaterial)
+
+road.rotation.x = -Math.PI/2
+scene.add(road)
+
+let carGeometry = new THREE.BoxGeometry(2,1,4)
+let carMaterial = new THREE.MeshBasicMaterial({color:0xff0000})
+let car = new THREE.Mesh(carGeometry, carMaterial)
+
+car.position.y = 0.5
+scene.add(car)
+
+camera.position.set(0,5,10)
+camera.lookAt(car.position)
+
 let speed = 0
 
 let keys = {}
 
-document.addEventListener("keydown", e => keys[e.key] = true)
-document.addEventListener("keyup", e => keys[e.key] = false)
+document.addEventListener("keydown",e=>keys[e.key]=true)
+document.addEventListener("keyup",e=>keys[e.key]=false)
 
-function gameLoop(){
+function animate(){
 
-if(keys["ArrowUp"]){
-speed += 0.2
-}
+requestAnimationFrame(animate)
 
-if(keys["ArrowDown"]){
-speed -= 0.2
-}
+if(keys["ArrowUp"]) speed += 0.02
+if(keys["ArrowDown"]) speed -= 0.02
 
 speed *= 0.98
 
-if(keys["ArrowLeft"]){
-angle -= 3
-}
+if(keys["ArrowLeft"]) car.rotation.y += 0.05
+if(keys["ArrowRight"]) car.rotation.y -= 0.05
 
-if(keys["ArrowRight"]){
-angle += 3
-}
+car.position.x -= Math.sin(car.rotation.y)*speed
+car.position.z -= Math.cos(car.rotation.y)*speed
 
-x += Math.sin(angle * Math.PI/180) * speed
-y -= Math.cos(angle * Math.PI/180) * speed
+camera.position.x = car.position.x
+camera.position.z = car.position.z + 10
 
-car.style.left = x + "px"
-car.style.top = y + "px"
-car.style.transform = "rotate(" + angle + "deg)"
+camera.lookAt(car.position)
 
-requestAnimationFrame(gameLoop)
+renderer.render(scene,camera)
 
 }
 
-gameLoop()
+animate()
 
 </script>
 
