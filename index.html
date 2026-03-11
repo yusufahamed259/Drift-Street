@@ -1,11 +1,64 @@
-const loader = new THREE.GLTFLoader()
+<!DOCTYPE html>
+<html>
+<head>
+<title>Drift-Street Pro</title>
 
-loader.load("ToyCar.glb", function(gltf){
+<style>
 
-car = gltf.scene
-car.scale.set(0.7,0.7,0.7)
-car.position.y = 0.2
+body{
+margin:0;
+overflow:hidden;
+font-family:Arial;
+}
 
-scene.add(car)
+#menu{
+position:absolute;
+width:100%;
+height:100%;
+background:black;
+color:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+}
 
-})
+#menu h1{
+font-size:60px;
+}
+
+#menu button{
+padding:15px 30px;
+font-size:20px;
+}
+
+#hud{
+position:absolute;
+top:10px;
+left:10px;
+color:white;
+font-size:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="menu">
+<h1>Drift-Street Pro</h1>
+<button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="hud">
+Score: <span id="score">0</span><br>
+Nitro: <span id="nitro">100</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/loaders/GLTFLoader.js"></script>
+
+<script src="game.js"></script>
+
+</body>
+</html>
